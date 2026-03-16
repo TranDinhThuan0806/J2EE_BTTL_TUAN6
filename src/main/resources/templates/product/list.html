@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{_layout}">
+<head>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+<div layout:fragment="content" class="container body-content">
+
+    <!-- Chỉ ADMIN mới thấy nút thêm sản phẩm -->
+    <div sec:authorize="hasRole('ADMIN')">
+        <a th:href="@{/products/add}" class="btn btn-primary mb-3">Create New Product</a>
+    </div>
+
+    <!-- Thông báo cho USER thường -->
+    <div sec:authorize="!hasRole('ADMIN')" class="alert alert-warning" role="alert">
+        <strong>⚠ Lưu ý:</strong> Bạn đang đăng nhập với quyền <strong>USER</strong>. Chỉ Admin mới có thể thêm, sửa, hoặc xóa sản phẩm.
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Image</th>
+            <th scope="col">Price</th>
+            <th scope="col">Category Name</th>
+            <th scope="col" sec:authorize="hasRole('ADMIN')">Actions</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="product : ${products}">
+            <th scope="row" th:text="${product.id}"></th>
+
+            <td th:text="${product.name}"></td>
+
+            <td>
+                <img height="120" width="150"
+                     th:src="${product.image}"
+                     alt="Product Image">
+            </td>
+
+            <td th:text="${product.price}"></td>
+
+            <td th:text="${product.category != null ? product.category.name : ''}"></td>
+
+            <!-- Chỉ ADMIN mới thấy nút Edit và Delete -->
+            <td sec:authorize="hasRole('ADMIN')">
+                <form th:action="@{/products/edit/{id}(id=${product.id})}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-secondary">Edit</button>
+                </form>
+
+                <form th:action="@{/products/delete/{id}(id=${product.id})}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </td>
+
+        </tr>
+        </tbody>
+
+    </table>
+
+</div>
+</body>
+</html>
